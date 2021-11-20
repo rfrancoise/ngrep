@@ -98,6 +98,10 @@
 #include <regex.h>
 #endif
 
+#if USE_TCPKILL
+#include "tcpkill.h"
+#endif
+
 #include "ngrep.h"
 
 
@@ -1500,8 +1504,6 @@ void version(void) {
 
 
 void clean_exit(int32_t sig) {
-    struct pcap_stat s;
-
     signal(SIGINT,   SIG_IGN);
     signal(SIGABRT,  SIG_IGN);
 #if !defined(_WIN32)
@@ -1529,6 +1531,7 @@ void clean_exit(int32_t sig) {
     if (quiet < 1 && sig >= 0 && !read_file)
         printf("%u received, %u matched\n", seen_frames, matches);
 
+    pcap_freecode(&pcapfilter);
     if (pd)           pcap_close(pd);
     if (pd_dumppcap)  pcap_close(pd_dumppcap);
     if (pd_dump)      pcap_dump_close(pd_dump);

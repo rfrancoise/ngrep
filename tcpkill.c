@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <err.h>
 #include <libnet.h>
 #include <pcap.h>
 
@@ -27,11 +28,10 @@ tcpkill_kill(const struct pcap_pkthdr *pcap, const u_char *pkt,
 {
   struct libnet_ipv4_hdr *ip;
   struct libnet_tcp_hdr *tcp;
-  u_char ctext[64];
-  uint32_t seq, win, i, len;
+  char ctext[64];
+  uint32_t seq, win, i;
 
   pkt += pcap_off;
-  len = pcap->caplen - pcap_off;
 
   ip = (struct libnet_ipv4_hdr *)pkt;
   if (ip->ip_p != IPPROTO_TCP)
@@ -67,7 +67,7 @@ tcpkill_kill(const struct pcap_pkthdr *pcap, const u_char *pkt,
       if (libnet_write(l) < 0)
           warn("write");
 
-      fprintf(stderr, "%s R %lu:%lu(0) win 0\n", ctext, seq, seq);
+      fprintf(stderr, "%s R %u:%u(0) win 0\n", ctext, seq, seq);
   }
 }
 
